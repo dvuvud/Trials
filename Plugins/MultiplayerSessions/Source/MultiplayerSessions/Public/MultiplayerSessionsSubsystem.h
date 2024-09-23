@@ -7,16 +7,15 @@
 #include "Interfaces/OnlineSessionInterface.h"
 
 #include "MultiplayerSessionsSubsystem.generated.h"
-//
-// Declaring own custom delegates for Menu class callbacks
-//
 
+//
+// Delcaring our own custom delegates for the Menu class to bind callbacks to
+//
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMultiplayerOnCreateSessionComplete, bool, bWasSuccessful);
-DECLARE_MULTICAST_DELEGATE_TwoParams(FMultiplayerOnFindSessionsComplete, const TArray<FOnlineSessionSearchResult>& SearchRestults, bool bWasSuccessful);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FMultiplayerOnFindSessionsComplete, const TArray<FOnlineSessionSearchResult>& SessionResults, bool bWasSuccessful);
 DECLARE_MULTICAST_DELEGATE_OneParam(FMultiplayerOnJoinSessionComplete, EOnJoinSessionCompleteResult::Type Result);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMultiplayerOnDestroySessionComplete, bool, bWasSuccesfull);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMultiplayerOnStartSessionComplete, bool, bWasSuccesfull);
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMultiplayerOnDestroySessionComplete, bool, bWasSuccessful);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMultiplayerOnStartSessionComplete, bool, bWasSuccessful);
 
 /**
  * 
@@ -28,8 +27,8 @@ class MULTIPLAYERSESSIONS_API UMultiplayerSessionsSubsystem : public UGameInstan
 public:
 	UMultiplayerSessionsSubsystem();
 
-	// 
-	// To handle public meny functionality. Menu etc
+	//
+	// To handle session functionality. The Menu class will call these
 	//
 	void CreateSession(int32 NumPublicConnections, FString MatchType);
 	void FindSessions(int32 MaxSearchResults);
@@ -38,7 +37,7 @@ public:
 	void StartSession();
 
 	//
-	// Our own custom delegates for the menu class to bind callbacks to
+	// Our own custom delegates for the Menu class to bind callbacks to
 	//
 	FMultiplayerOnCreateSessionComplete MultiplayerOnCreateSessionComplete;
 	FMultiplayerOnFindSessionsComplete MultiplayerOnFindSessionsComplete;
@@ -48,30 +47,24 @@ public:
 
 protected:
 
-//
-// Internal callbacks for the delegates we'll add to the Online Session Interface delegate list.
-// These don't need to be called outside this class.
-//
-void OnCreateSessionComplete(FName SessionName, bool bWasSuccessful);
-void OnFindSessionsComplete(bool bWasSuccessful);
-void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
-void OnDestroySessionComplete(FName SessionName, bool bWasSuccessful);
-void OnStartSessionComplete(FName SessionName, bool bWasSuccessful);
-
+	//
+	// Internal callbacks for the delegates we'll add to the Online Session Interface delegate list.
+	// Thise don't need to be called outside this class.
+	//
+	void OnCreateSessionComplete(FName SessionName, bool bWasSuccessful);
+	void OnFindSessionsComplete(bool bWasSuccessful);
+	void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
+	void OnDestroySessionComplete(FName SessionName, bool bWasSuccessful);
+	void OnStartSessionComplete(FName SessionName, bool bWasSuccessful);
 
 private:
-	// IOnlineSessionPtr is a typedef
-	// The member functions are not in use in the header file therefore this is redundant
-	// TSharedPtr<class IOnlineSession,ESPMode::ThreadSafe> SessionInterface: would be a more efficient way to declare this variable
-	// Same goes for the delegates further down
 	IOnlineSessionPtr SessionInterface;
 	TSharedPtr<FOnlineSessionSettings> LastSessionSettings;
 	TSharedPtr<FOnlineSessionSearch> LastSessionSearch;
 
 	//
-	// To add to the online session interface delegate list
+	// To add to the Online Session Interface delegate list.
 	// We'll bind our MultiplayerSessionsSubsystem internal callbacks to these.
-	// Called by steams servers whenever a given event occurs, all bound callbacks are then called
 	//
 	FOnCreateSessionCompleteDelegate CreateSessionCompleteDelegate;
 	FDelegateHandle CreateSessionCompleteDelegateHandle;
