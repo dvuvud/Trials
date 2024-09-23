@@ -5,7 +5,7 @@
 ===========================================================================*/
 
 #include "UObject/GeneratedCppIncludes.h"
-#include "MultiplayerSessions/Public/Menu.h"
+#include "Public/Menu.h"
 PRAGMA_DISABLE_DEPRECATION_WARNINGS
 void EmptyLinkFunctionForGeneratedCodeMenu() {}
 
@@ -86,7 +86,7 @@ struct Z_Construct_UFunction_UMenu_MenuSetup_Statics
 	};
 #if WITH_METADATA
 	static constexpr UECodeGen_Private::FMetaDataPairParam Function_MetaDataParams[] = {
-		{ "CPP_Default_LobbyPath", "/Game/ThirdPersonCPP/Maps/Lobby" },
+		{ "CPP_Default_LobbyPath", "/Game/ThirdPerson/Maps/Lobby" },
 		{ "CPP_Default_NumberOfPublicConnections", "4" },
 		{ "CPP_Default_TypeOfMatch", "FreeForAll" },
 		{ "ModuleRelativePath", "Public/Menu.h" },
@@ -140,11 +140,11 @@ struct Z_Construct_UFunction_UMenu_OnCreateSession_Statics
 #if WITH_METADATA
 	static constexpr UECodeGen_Private::FMetaDataPairParam Function_MetaDataParams[] = {
 #if !UE_BUILD_SHIPPING
-		{ "Comment", "//\n// Callbacks for the custom delegates on the MultiplayerSessionsSubsystem\n//\n" },
+		{ "Comment", "//\n// Callbacks for the custom delegates on the multiplayer session subsystem class\n//\n" },
 #endif
 		{ "ModuleRelativePath", "Public/Menu.h" },
 #if !UE_BUILD_SHIPPING
-		{ "ToolTip", "Callbacks for the custom delegates on the MultiplayerSessionsSubsystem" },
+		{ "ToolTip", "Callbacks for the custom delegates on the multiplayer session subsystem class" },
 #endif
 	};
 #endif // WITH_METADATA
@@ -324,8 +324,8 @@ struct Z_Construct_UClass_UMenu_Statics
 	static constexpr FClassFunctionLinkInfo FuncInfo[] = {
 		{ &Z_Construct_UFunction_UMenu_HostButtonClicked, "HostButtonClicked" }, // 128811646
 		{ &Z_Construct_UFunction_UMenu_JoinButtonClicked, "JoinButtonClicked" }, // 3398739101
-		{ &Z_Construct_UFunction_UMenu_MenuSetup, "MenuSetup" }, // 3913678519
-		{ &Z_Construct_UFunction_UMenu_OnCreateSession, "OnCreateSession" }, // 2474130283
+		{ &Z_Construct_UFunction_UMenu_MenuSetup, "MenuSetup" }, // 3350469954
+		{ &Z_Construct_UFunction_UMenu_OnCreateSession, "OnCreateSession" }, // 1369522138
 		{ &Z_Construct_UFunction_UMenu_OnDestroySession, "OnDestroySession" }, // 122917252
 		{ &Z_Construct_UFunction_UMenu_OnStartSession, "OnStartSession" }, // 1266615269
 	};
@@ -380,14 +380,14 @@ UMenu::~UMenu() {}
 // End Class UMenu
 
 // Begin Registration
-struct Z_CompiledInDeferFile_FID_Users_David_Unreal_Projects_Trials_Plugins_MultiplayerSessions_Source_MultiplayerSessions_Public_Menu_h_Statics
+struct Z_CompiledInDeferFile_FID_Users_David_Unreal_Projects_Trials_Plugins_MultiplayerSessions_Source_Public_Menu_h_Statics
 {
 	static constexpr FClassRegisterCompiledInInfo ClassInfo[] = {
-		{ Z_Construct_UClass_UMenu, UMenu::StaticClass, TEXT("UMenu"), &Z_Registration_Info_UClass_UMenu, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(UMenu), 2501060945U) },
+		{ Z_Construct_UClass_UMenu, UMenu::StaticClass, TEXT("UMenu"), &Z_Registration_Info_UClass_UMenu, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(UMenu), 3823112470U) },
 	};
 };
-static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Users_David_Unreal_Projects_Trials_Plugins_MultiplayerSessions_Source_MultiplayerSessions_Public_Menu_h_2098875772(TEXT("/Script/MultiplayerSessions"),
-	Z_CompiledInDeferFile_FID_Users_David_Unreal_Projects_Trials_Plugins_MultiplayerSessions_Source_MultiplayerSessions_Public_Menu_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_Users_David_Unreal_Projects_Trials_Plugins_MultiplayerSessions_Source_MultiplayerSessions_Public_Menu_h_Statics::ClassInfo),
+static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Users_David_Unreal_Projects_Trials_Plugins_MultiplayerSessions_Source_Public_Menu_h_1982571766(TEXT("/Script/MultiplayerSessions"),
+	Z_CompiledInDeferFile_FID_Users_David_Unreal_Projects_Trials_Plugins_MultiplayerSessions_Source_Public_Menu_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_Users_David_Unreal_Projects_Trials_Plugins_MultiplayerSessions_Source_Public_Menu_h_Statics::ClassInfo),
 	nullptr, 0,
 	nullptr, 0);
 // End Registration
