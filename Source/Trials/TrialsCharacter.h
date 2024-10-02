@@ -35,6 +35,9 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	virtual void PostInitializeComponents() override;
+	
+	UFUNCTION(BlueprintCallable)
+	void SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled);
 
 protected:
 	virtual void BeginPlay() override;
@@ -101,7 +104,7 @@ protected:
 	int32 ToggleFlightInt = 1;
 
 	UPROPERTY(EditAnywhere)
-	float FlyUpDownSpeed = 20.f;
+	float FlyUpDownSpeed = 10.f;
 
 	UPROPERTY(ReplicatedUsing = OnRep_ToggleFlight)
 	bool bIsFlying;

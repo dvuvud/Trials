@@ -16,6 +16,7 @@
 #include "Trials/TrialsComponents/CombatComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Components/BoxComponent.h"
 #include "Animation/AnimMontage.h"
 
 
@@ -73,6 +74,15 @@ void ATrialsCharacter::PostInitializeComponents()
 	if (Combat)
 	{
 		Combat->Character = this;
+	}
+}
+
+void ATrialsCharacter::SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled)
+{
+	AWeapon* EquippedWeapon = GetEquippedWeapon();
+	if (EquippedWeapon && EquippedWeapon->GetWeaponBox())
+	{
+		EquippedWeapon->GetWeaponBox()->SetCollisionEnabled(CollisionEnabled);
 	}
 }
 
