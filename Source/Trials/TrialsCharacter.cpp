@@ -83,6 +83,7 @@ void ATrialsCharacter::SetWeaponCollisionEnabled(ECollisionEnabled::Type Collisi
 	if (EquippedWeapon && EquippedWeapon->GetWeaponBox())
 	{
 		EquippedWeapon->GetWeaponBox()->SetCollisionEnabled(CollisionEnabled);
+		EquippedWeapon->IgnoreActors.Empty();
 	}
 }
 
@@ -199,7 +200,8 @@ void ATrialsCharacter::CrouchButtonPressed()
 
 void ATrialsCharacter::BlockButtonPressed()
 {
-	if (bIsFlying) return;
+	if (bIsFlying || ActionState == EActionState::EAS_Attacking) return;
+	if (GetEquippedWeapon() == nullptr) return;
 	if (Combat)
 	{
 		Combat->SetBlocking(true);
@@ -208,7 +210,7 @@ void ATrialsCharacter::BlockButtonPressed()
 
 void ATrialsCharacter::BlockButtonReleased()
 {
-	if (Combat)
+	if (Combat && Combat->bBlocking)
 	{
 		Combat->SetBlocking(false);
 	}
@@ -268,7 +270,7 @@ void ATrialsCharacter::PlayMontageFunction(UAnimMontage* MontageToPlay)
 	
 	if (AnimInstance && MontageToPlay)
 	{
-		AnimInstance->Montage_Play(AttackMontage);
+		AnimInstance->Montage_Play(MontageToPlay);
 		AnimationSelectionINT = (AnimationSelectionINT + 1) % 2;
 		FName SelectionName = FName();
 		switch (AnimationSelectionINT)
@@ -280,7 +282,7 @@ void ATrialsCharacter::PlayMontageFunction(UAnimMontage* MontageToPlay)
 			SelectionName = FName("Attack2");
 				break;
 		}
-		AnimInstance->Montage_JumpToSection(SelectionName, AttackMontage);
+		AnimInstance->Montage_JumpToSection(SelectionName, MontageToPlay);
 	}
 }
 
@@ -406,6 +408,7 @@ FString ATrialsCharacter::GetSteamName(APlayerController* PlayerController)
 					if (UniqueNetId.IsValid())
 					{
 						FString PlayerName = IdentityInterface->GetPlayerNickname(*UniqueNetId);
+						return PlayerName;
 					}
 				}
             }
@@ -506,31 +509,100 @@ void ATrialsCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon)
 
 void ATrialsCharacter::OnRep_ActionState()
 {
-	if (ActionState == EActionState::EAS_Attacking)
+	AWeapon* EquippedWeapon = GetEquippedWeapon();
+	if (!EquippedWeapon) { return; }
+	switch (EquippedWeapon->GetWeaponType())
 	{
-		PlayMontageFunction(AttackMontage);
+	case EWeaponType::EWT_Melee:
+		if (ActionState == EActionState::EAS_Attacking)
+		{
+			if (AttackMontage)
+			{
+				PlayMontageFunction(AttackMontage);
+			}
+		}
+		break;
+	case EWeaponType::EWT_Magic:
+		if (ActionState == EActionState::EAS_Attacking)
+		{
+			if (MagicAttackMontage)
+			{
+				PlayMontageFunction(MagicAttackMontage);
+			}
+		}
+		break;
+	default:
+		break;
 	}
 }
 
 void ATrialsCharacter::ServerLightAttack_Implementation()
 {
-	if (ActionState == EActionState::EAS_Unoccupied)
+	AWeapon* EquippedWeapon = GetEquippedWeapon();
+	if (!EquippedWeapon) { return; }
+	switch (EquippedWeapon->GetWeaponType())
 	{
-		PlayMontageFunction(AttackMontage);
-		ActionState = EActionState::EAS_Attacking;
+	case EWeaponType::EWT_Melee:
+		if (ActionState == EActionState::EAS_Unoccupied)
+		{
+			if (AttackMontage)
+			{
+				PlayMontageFunction(AttackMontage);
+				ActionState = EActionState::EAS_Attacking;
+			}
+		}
+		break;
+	case EWeaponType::EWT_Magic:
+		if (ActionState == EActionState::EAS_Unoccupied)
+		{
+			if (MagicAttackMontage)
+			{
+				PlayMontageFunction(MagicAttackMontage);
+				ActionState = EActionState::EAS_Attacking;
+			}
+		}
+		break;
+	default:
+		break;
 	}
+	
 }
 
 void ATrialsCharacter::LightAttackButtonPressed()
 {
-	if (!IsWeaponEquipped()) { return; }
-	if (HasAuthority() && ActionState == EActionState::EAS_Unoccupied)
+	AWeapon* EquippedWeapon = GetEquippedWeapon();
+	if (!EquippedWeapon) { return; }
+	switch (EquippedWeapon->GetWeaponType())
 	{
-		PlayMontageFunction(AttackMontage);
-		ActionState = EActionState::EAS_Attacking;
-	}
-	else if (ActionState == EActionState::EAS_Unoccupied)
-	{
-		ServerLightAttack();
+	case EWeaponType::EWT_Melee:
+		if (HasAuthority() && ActionState == EActionState::EAS_Unoccupied)
+		{
+			if (AttackMontage)
+			{
+				PlayMontageFunction(AttackMontage);
+				ActionState = EActionState::EAS_Attacking;
+			}
+		}
+		else if (ActionState == EActionState::EAS_Unoccupied)
+		{
+			ServerLightAttack();
+		}
+		break;
+	case EWeaponType::EWT_Magic:
+		if (HasAuthority() && ActionState == EActionState::EAS_Unoccupied)
+		{
+			if (MagicAttackMontage)
+			{
+				PlayMontageFunction(MagicAttackMontage);
+				ActionState = EActionState::EAS_Attacking;
+			}
+		}
+		else if (ActionState == EActionState::EAS_Unoccupied)
+		{
+			ServerLightAttack();
+		}
+		break;
+	default:
+		break;
 	}
 }

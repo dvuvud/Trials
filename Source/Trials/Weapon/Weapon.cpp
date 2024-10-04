@@ -8,8 +8,6 @@
 #include "Net/UnrealNetwork.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Components/BoxComponent.h"
-#include "Trials/Interfaces/GetHitInterface.h"
-
 
 AWeapon::AWeapon()
 {
@@ -31,14 +29,7 @@ AWeapon::AWeapon()
 	PickupWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("PickupWidget"));
 	PickupWidget->SetupAttachment(RootComponent);
 
-	WeaponBox = CreateDefaultSubobject<UBoxComponent>(TEXT("WeaponBox"));
-	WeaponBox->SetupAttachment(RootComponent);
-	WeaponBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	WeaponBox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
-	BoxTraceStart = CreateDefaultSubobject<USceneComponent>(TEXT("BoxTraceStart"));
-	BoxTraceStart->SetupAttachment(RootComponent);
-	BoxTraceEnd = CreateDefaultSubobject<USceneComponent>(TEXT("BoxTraceEnd"));
-	BoxTraceEnd->SetupAttachment(RootComponent);
+	
 }	
 
 void AWeapon::BeginPlay()
@@ -57,7 +48,6 @@ void AWeapon::BeginPlay()
 		PickupWidget->SetVisibility(false);
 	}
 
-	WeaponBox->OnComponentBeginOverlap.AddDynamic(this, &AWeapon::OnBoxOverlap);
 }
 
 void AWeapon::Tick(float DeltaTime)
@@ -100,38 +90,6 @@ void AWeapon::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	}
 }
 
-void AWeapon::OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	const FVector Start = BoxTraceStart->GetComponentLocation();
-	const FVector End = BoxTraceEnd->GetComponentLocation();
-
-	TArray<AActor*> ActorsToIgnore;
-	ActorsToIgnore.Add(this);
-	ActorsToIgnore.Add(this->GetOwner());
-	FHitResult BoxHit;
-	UKismetSystemLibrary::BoxTraceSingle(
-		this,
-		Start,
-		End,
-		FVector(5.f, 5.f, 5.f),
-		BoxTraceStart->GetComponentRotation(),
-		ETraceTypeQuery::TraceTypeQuery1,
-		false,
-		ActorsToIgnore,
-		EDrawDebugTrace::ForDuration,
-		BoxHit,
-		true
-	);
-	if (BoxHit.GetActor())
-	{
-		IGetHitInterface* HitInterface = Cast<IGetHitInterface>(BoxHit.GetActor());
-		if (HitInterface)
-		{
-			HitInterface->GetHit(BoxHit.ImpactPoint);
-		}
-	}
-}
-
 void AWeapon::OnRep_WeaponState()
 {
 	switch (WeaponState)
@@ -163,5 +121,4 @@ void AWeapon::SetWeaponState(EWeaponState State)
 	case EWeaponState::EWS_Unequipped:
 		break;
 	}
-	
 }

@@ -85,5 +85,8 @@ private:
 	UPROPERTY(BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	UCombatComponent* CombatComponent;
 
+	UPROPERTY(BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
+	EWeaponType WeaponType;
+
 	FRotator DeltaRotation;
 };

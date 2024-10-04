@@ -56,6 +56,7 @@ void UTrialsAnimInstance::NativeUpdateAnimation(float DeltaTime)
     if (EquippedWeapon)
     {
         WeaponState = EquippedWeapon->GetWeaponState();
+        WeaponType = EquippedWeapon->GetWeaponType();
     }
     SheathedWeapon = TrialsCharacter->GetSheathedWeapon();
     CombatComponent = TrialsCharacter->GetCombat();

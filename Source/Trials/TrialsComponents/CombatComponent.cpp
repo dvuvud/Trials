@@ -36,7 +36,14 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 	EquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
 	if (!SheathedWeapon)
 	{
-		AttachWeapon(EquippedWeapon, FName("RightHandSocket"));
+		if (EquippedWeapon->GetWeaponType() == EWeaponType::EWT_Melee)
+		{
+			AttachWeapon(EquippedWeapon, FName("RightHandSocket"));
+		}
+		else if (EquippedWeapon->GetWeaponType() == EWeaponType::EWT_Magic)
+		{
+			AttachWeapon(EquippedWeapon, FName("MagicSocket"));
+		}
 	}
 	EquippedWeapon->SetOwner(Character);
 	EquippedWeapon->ShowPickupWidget(false);

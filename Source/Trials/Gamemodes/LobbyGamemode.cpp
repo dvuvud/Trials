@@ -28,6 +28,6 @@ void ALobbyGamemode::MoveToEureka()
     if (World)
     {
         bUseSeamlessTravel = true;
-        World->ServerTravel(FString("/Game/Maps/Opal?listen"));
+        World->ServerTravel(FString("/Game/Maps/GrassLands?listen"));
     }
 }

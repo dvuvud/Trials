@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Trials/TrialsTypes/WeaponType.h"
 #include "Weapon.generated.h"
 
 UENUM(BlueprintType)
@@ -31,8 +32,13 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	void ShowPickupWidget(bool bShowWidget);
+
+	TArray<AActor*> IgnoreActors;
 protected:
 	virtual void BeginPlay() override;
+
+	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties")
+	UBoxComponent* WeaponBox;
 
 	UFUNCTION()
 	virtual void OnSphereOverlap(
@@ -52,28 +58,21 @@ protected:
 		int32 OtherBodyIndex
 	);
 
+	EWeaponType WeaponType;
+
 	UFUNCTION()
-	virtual void OnBoxOverlap(
-		UPrimitiveComponent* OverlappedComponent,
-		AActor* OtherActor,
-		UPrimitiveComponent* OtherComp,
-		int32 OtherBodyIndex,
-		bool bFromSweep,
-		const FHitResult& SweepResult
-	);
-
-private:
-	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties")
-	USkeletalMeshComponent* WeaponMesh;
-
-	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties")
-	USphereComponent* AreaSphere;
+	virtual void OnRep_WeaponState();
 
 	UPROPERTY(ReplicatedUsing = OnRep_WeaponState, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Weapon Properties")
 	EWeaponState WeaponState;
 
-	UFUNCTION()
-	void OnRep_WeaponState();
+	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties")
+	USkeletalMeshComponent* WeaponMesh;
+private:
+	
+
+	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties")
+	USphereComponent* AreaSphere;
 
 	UPROPERTY(EditAnywhere, Category = "Weapon Properties")
 	UWidgetComponent* PickupWidget;
@@ -83,19 +82,13 @@ private:
 
 	float HoverSpeed = 0.f;
 
-	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties")
-	UBoxComponent* WeaponBox;
-
-	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties")
-	USceneComponent* BoxTraceStart;
-	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties")
-	USceneComponent* BoxTraceEnd;
 public:	
 	
-	void SetWeaponState(EWeaponState State);
+	virtual void SetWeaponState(EWeaponState State);
 	FORCEINLINE USphereComponent* GetAreaSphere() const { return AreaSphere; }
 	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh() const { return WeaponMesh; }
 	FORCEINLINE EWeaponState GetWeaponState() { return WeaponState; }
 	FORCEINLINE UBoxComponent* GetWeaponBox() const { return WeaponBox; }
+	FORCEINLINE EWeaponType GetWeaponType() const { return WeaponType; }
 
 };

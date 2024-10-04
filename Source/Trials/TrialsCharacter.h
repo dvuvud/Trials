@@ -79,6 +79,9 @@ protected:
 	UAnimMontage* AttackMontage;
 
 	UPROPERTY(EditDefaultsOnly, Category = Animations)
+	UAnimMontage* MagicAttackMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = Animations)
 	UAnimMontage* SheathMontage;
 
 
@@ -141,7 +144,6 @@ public:
 
 
 private:
-
 	APlayerController* TrialsPlayerController;
 
 	UPROPERTY(EditAnywhere, Category = Camera)
