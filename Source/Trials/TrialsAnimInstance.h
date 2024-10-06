@@ -29,6 +29,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Animations")
     void SetIdlingTime(float NewIdlingTime);
 
+protected:
+	UFUNCTION(BlueprintCallable)
+	void OnShootProjectileNotify();
+
 private:
 
 	UPROPERTY(BlueprintReadOnly, Category = Character, meta = (AllowPrivateAccess = "true"))

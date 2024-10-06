@@ -34,6 +34,26 @@ public:
 	void ShowPickupWidget(bool bShowWidget);
 
 	TArray<AActor*> IgnoreActors;
+
+	/*
+	* Textures for weapon crosshairs
+	*/
+
+	UPROPERTY(EditAnywhere)
+	UTexture2D* CrosshairsCenter;
+
+	UPROPERTY(EditAnywhere)
+	UTexture2D* CrosshairsLeft;
+
+	UPROPERTY(EditAnywhere)
+	UTexture2D* CrosshairsRight;
+
+	UPROPERTY(EditAnywhere)
+	UTexture2D* CrosshairsTop;
+
+	UPROPERTY(EditAnywhere)
+	UTexture2D* CrosshairsBottom;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -68,6 +88,10 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties")
 	USkeletalMeshComponent* WeaponMesh;
+
+	UFUNCTION(BlueprintCallable)
+	virtual void ShootProjectile(const FVector& HitTarget);
+
 private:
 	
 
@@ -82,6 +106,7 @@ private:
 
 	float HoverSpeed = 0.f;
 
+	
 public:	
 	
 	virtual void SetWeaponState(EWeaponState State);
@@ -89,6 +114,7 @@ public:
 	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh() const { return WeaponMesh; }
 	FORCEINLINE EWeaponState GetWeaponState() { return WeaponState; }
 	FORCEINLINE UBoxComponent* GetWeaponBox() const { return WeaponBox; }
+	UFUNCTION(BlueprintCallable)
 	FORCEINLINE EWeaponType GetWeaponType() const { return WeaponType; }
 
 };

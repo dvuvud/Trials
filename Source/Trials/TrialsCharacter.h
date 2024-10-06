@@ -117,6 +117,7 @@ protected:
 
 	virtual void Jump() override;
 
+
 private:
 
 	UPROPERTY(VisibleAnywhere, Category=Camera)
@@ -126,7 +127,7 @@ private:
 
 	ETurningInPlace TurningInPlace;
 
-	UPROPERTY(ReplicatedUsing = OnRep_ActionState, BlueprintReadWrite, meta = (AllowPrivateAccess = true), Category = "Player States")
+	UPROPERTY(Replicated, BlueprintReadonly, meta = (AllowPrivateAccess = true), Category = "Player States")
 	EActionState ActionState = EActionState::EAS_Unoccupied;
 
 	float AO_Yaw;
@@ -139,18 +140,31 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UFUNCTION(BlueprintCallable, Category="Steam")
-	static FString GetSteamName(APlayerController* PlayerController);
-
-
 private:
 	APlayerController* TrialsPlayerController;
 
+	FString GetSteamName();
+
+	UPROPERTY(VisibleAnywhere, Category = "Widget")
+	UWidgetComponent* PlayerNameWidget;
+
+	UPROPERTY(ReplicatedUsing = OnRep_PlayerName)
+	FString ReplicatedPlayerName;
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastPlayerName(const FString& PlayerName);
+
+	UFUNCTION()
+	void OnRep_PlayerName();
+
+	UFUNCTION(Server, Reliable)
+	void ServerGetPlayerName();
+
+	UFUNCTION(BlueprintCallable)
+	void SetActionState(EActionState NewActionState);
+
 	UPROPERTY(EditAnywhere, Category = Camera)
 	float MouseSensitivity = 0.5f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UWidgetComponent* PlayerNameWidget;
 
 	UPROPERTY(ReplicatedUsing = OnRep_OverlappingWeapon)
 	AWeapon* OverlappingWeapon;
@@ -167,11 +181,11 @@ private:
 	UFUNCTION(Server, Reliable)
 	void ServerToggleFlight();
 
-	UFUNCTION()
-	void OnRep_ActionState();
-
 	UFUNCTION(Server, Reliable)
 	void ServerLightAttack();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastLightAttack();
 
 	bool RotationWasNotOrientedToMovement;
 	bool WasUsingControllerRotationYaw;

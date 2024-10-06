@@ -18,6 +18,8 @@ public:
 
 	virtual void GetHit(const FVector& ImpactPoint) override;
 
+	virtual void GetHitMagic(const FVector& ImpactPoint) override;
+
 	void DirectionalHitReact(const FVector& ImpactPoint);
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;

@@ -5,12 +5,14 @@
 #include "TrialsCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Trials/TrialsComponents/CombatComponent.h"
 
 void UTrialsAnimInstance::NativeInitializeAnimation()
 {
     Super::NativeInitializeAnimation();
 
     TrialsCharacter = Cast<ATrialsCharacter>(TryGetPawnOwner());
+    
 }
 
 void UTrialsAnimInstance::NativeUpdateAnimation(float DeltaTime)
@@ -76,4 +78,12 @@ void UTrialsAnimInstance::NativeUpdateAnimation(float DeltaTime)
 void UTrialsAnimInstance::SetIdlingTime(float NewIdlingTime)
 {
     IdlingTime = NewIdlingTime;
+}
+
+void UTrialsAnimInstance::OnShootProjectileNotify()
+{
+    if (CombatComponent)
+    {
+        CombatComponent->ShootProjectileNotifyBegan();
+    }
 }

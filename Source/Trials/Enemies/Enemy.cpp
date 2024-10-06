@@ -45,6 +45,11 @@ void AEnemy::GetHit(const FVector& ImpactPoint)
 
 }
 
+void AEnemy::GetHitMagic(const FVector& ImpactPoint)
+{
+
+}
+
 void AEnemy::DirectionalHitReact(const FVector& ImpactPoint)
 {
 	const FVector ForwardVector = GetActorForwardVector();

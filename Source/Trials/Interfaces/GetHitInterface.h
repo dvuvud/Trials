@@ -20,4 +20,5 @@ class TRIALS_API IGetHitInterface
 
 public:
 	virtual void GetHit(const FVector& ImpactPoint) = 0;
+	virtual void GetHitMagic(const FVector& ImpactPoint) = 0;
 };

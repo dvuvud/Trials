@@ -103,6 +103,11 @@ void AWeapon::OnRep_WeaponState()
 	}
 }
 
+void AWeapon::ShootProjectile(const FVector& HitTarget)
+{
+
+}
+
 float AWeapon::FloatingSin(float DeltaTime, float Speed, float Altitude)
 {
 	HoverSpeed += Speed * DeltaTime;

@@ -17,5 +17,4 @@ void UFloatingNameWidget::SetDisplayText(FString TextToDisplay)
     {
         PlayerNameText->SetText(FText::FromString(TextToDisplay));
     }
-
 }

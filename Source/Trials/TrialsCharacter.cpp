@@ -18,14 +18,14 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Components/BoxComponent.h"
 #include "Animation/AnimMontage.h"
-
-
+#include "Trials/HUD/FloatingNameWidget.h"
 
 
 
 ATrialsCharacter::ATrialsCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	bReplicates = true;
 
 	CameraSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	CameraSpringArm->SetupAttachment(GetMesh());
@@ -65,6 +65,7 @@ void ATrialsCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(ATrialsCharacter, bIsFlying);
 	DOREPLIFETIME(ATrialsCharacter, ActionState);
 	DOREPLIFETIME(ATrialsCharacter, bSheath);
+	DOREPLIFETIME(ATrialsCharacter, ReplicatedPlayerName);
 }
 
 void ATrialsCharacter::PostInitializeComponents()
@@ -100,7 +101,19 @@ void ATrialsCharacter::BeginPlay()
 			Subsystem->AddMappingContext(CharacterMappingContext, 0);
 		}
 	}
-	
+
+	if (HasAuthority())
+	{
+		MulticastPlayerName(GetSteamName());
+	}
+	else if (IsLocallyControlled())
+	{
+		MulticastPlayerName(GetSteamName());
+	}
+	else if (!HasAuthority() && !IsLocallyControlled())
+	{
+		ServerGetPlayerName();
+	}
 }
 
 void ATrialsCharacter::Tick(float DeltaTime)
@@ -391,30 +404,69 @@ void ATrialsCharacter::Jump()
 	}
 }
 
-FString ATrialsCharacter::GetSteamName(APlayerController* PlayerController)
+FString ATrialsCharacter::GetSteamName()
 {
-    if (PlayerController)
-    {
-        IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get();
-        if (OnlineSubsystem)
-        {
-            IOnlineIdentityPtr IdentityInterface = OnlineSubsystem->GetIdentityInterface();
-            if (IdentityInterface.IsValid())
-            {
-				APlayerState* SteamPlayerState = PlayerController->PlayerState;
+	FString PlayerName;
+	if (TrialsPlayerController)
+	{
+		IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get();
+		if (OnlineSubsystem)
+		{
+			IOnlineIdentityPtr IdentityInterface = OnlineSubsystem->GetIdentityInterface();
+			if (IdentityInterface.IsValid())
+			{
+				APlayerState* SteamPlayerState = TrialsPlayerController->PlayerState;
 				if (SteamPlayerState)
 				{
 					FUniqueNetIdRepl UniqueNetId = SteamPlayerState->GetUniqueId();
 					if (UniqueNetId.IsValid())
 					{
-						FString PlayerName = IdentityInterface->GetPlayerNickname(*UniqueNetId);
-						return PlayerName;
+						PlayerName = IdentityInterface->GetPlayerNickname(*UniqueNetId);
 					}
 				}
-            }
-        }
-    }
-    return FString("Unknown Player");
+			}
+		}
+	}
+	if (PlayerName.Len() == 0)
+	{
+		PlayerName = FString::Printf(TEXT("Unknown Player"));
+	}
+
+	return PlayerName;
+}
+
+void ATrialsCharacter::MulticastPlayerName_Implementation(const FString& PlayerName)
+{
+	if (PlayerNameWidget)
+	{
+		UFloatingNameWidget* FloatingNameWidget = Cast<UFloatingNameWidget>(PlayerNameWidget->GetUserWidgetObject());
+		if (FloatingNameWidget)
+		{
+			FloatingNameWidget->SetDisplayText(PlayerName);
+		}
+	}
+}
+
+void ATrialsCharacter::OnRep_PlayerName()
+{
+	if (PlayerNameWidget)
+	{
+		UFloatingNameWidget* FloatingNameWidget = Cast<UFloatingNameWidget>(PlayerNameWidget->GetUserWidgetObject());
+		if (FloatingNameWidget)
+		{
+			FloatingNameWidget->SetDisplayText(ReplicatedPlayerName);
+		}
+	}
+}
+
+void ATrialsCharacter::ServerGetPlayerName_Implementation()
+{
+	ReplicatedPlayerName = GetSteamName();
+}
+
+void ATrialsCharacter::SetActionState(EActionState NewActionState)
+{
+	ActionState = NewActionState;
 }
 
 void ATrialsCharacter::ServerEquipButtonPressed_Implementation()
@@ -507,28 +559,24 @@ void ATrialsCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon)
 	}
 }
 
-void ATrialsCharacter::OnRep_ActionState()
+void ATrialsCharacter::MulticastLightAttack_Implementation()
 {
 	AWeapon* EquippedWeapon = GetEquippedWeapon();
 	if (!EquippedWeapon) { return; }
 	switch (EquippedWeapon->GetWeaponType())
 	{
 	case EWeaponType::EWT_Melee:
-		if (ActionState == EActionState::EAS_Attacking)
+		if (AttackMontage)
 		{
-			if (AttackMontage)
-			{
-				PlayMontageFunction(AttackMontage);
-			}
+			PlayMontageFunction(AttackMontage);
+			ActionState = EActionState::EAS_Attacking;
 		}
 		break;
 	case EWeaponType::EWT_Magic:
-		if (ActionState == EActionState::EAS_Attacking)
+		if (MagicAttackMontage)
 		{
-			if (MagicAttackMontage)
-			{
-				PlayMontageFunction(MagicAttackMontage);
-			}
+			PlayMontageFunction(MagicAttackMontage);
+			ActionState = EActionState::EAS_Attacking;
 		}
 		break;
 	default:
@@ -538,71 +586,22 @@ void ATrialsCharacter::OnRep_ActionState()
 
 void ATrialsCharacter::ServerLightAttack_Implementation()
 {
-	AWeapon* EquippedWeapon = GetEquippedWeapon();
-	if (!EquippedWeapon) { return; }
-	switch (EquippedWeapon->GetWeaponType())
+	if (ActionState == EActionState::EAS_Unoccupied)
 	{
-	case EWeaponType::EWT_Melee:
-		if (ActionState == EActionState::EAS_Unoccupied)
-		{
-			if (AttackMontage)
-			{
-				PlayMontageFunction(AttackMontage);
-				ActionState = EActionState::EAS_Attacking;
-			}
-		}
-		break;
-	case EWeaponType::EWT_Magic:
-		if (ActionState == EActionState::EAS_Unoccupied)
-		{
-			if (MagicAttackMontage)
-			{
-				PlayMontageFunction(MagicAttackMontage);
-				ActionState = EActionState::EAS_Attacking;
-			}
-		}
-		break;
-	default:
-		break;
+		ActionState = EActionState::EAS_Attacking;
+		MulticastLightAttack();
 	}
-	
 }
 
 void ATrialsCharacter::LightAttackButtonPressed()
 {
-	AWeapon* EquippedWeapon = GetEquippedWeapon();
-	if (!EquippedWeapon) { return; }
-	switch (EquippedWeapon->GetWeaponType())
+	if (!GetEquippedWeapon()) return;
+	if (!HasAuthority() && Combat && ActionState == EActionState::EAS_Unoccupied)
 	{
-	case EWeaponType::EWT_Melee:
-		if (HasAuthority() && ActionState == EActionState::EAS_Unoccupied)
-		{
-			if (AttackMontage)
-			{
-				PlayMontageFunction(AttackMontage);
-				ActionState = EActionState::EAS_Attacking;
-			}
-		}
-		else if (ActionState == EActionState::EAS_Unoccupied)
-		{
-			ServerLightAttack();
-		}
-		break;
-	case EWeaponType::EWT_Magic:
-		if (HasAuthority() && ActionState == EActionState::EAS_Unoccupied)
-		{
-			if (MagicAttackMontage)
-			{
-				PlayMontageFunction(MagicAttackMontage);
-				ActionState = EActionState::EAS_Attacking;
-			}
-		}
-		else if (ActionState == EActionState::EAS_Unoccupied)
-		{
-			ServerLightAttack();
-		}
-		break;
-	default:
-		break;
+		ServerLightAttack();
+	}
+	else if (HasAuthority() && Combat && ActionState == EActionState::EAS_Unoccupied)
+	{
+		MulticastLightAttack();
 	}
 }

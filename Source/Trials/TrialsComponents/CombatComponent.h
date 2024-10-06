@@ -5,8 +5,13 @@
 #include "Components/ActorComponent.h"
 #include "CombatComponent.generated.h"
 
+
+#define TRACE_LENGTH 80000.f
+
 class AWeapon;
 class ATrialsCharacter;
+class ATrialsHUD;
+class ATrialsPlayerController;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class TRIALS_API UCombatComponent : public UActorComponent
@@ -28,8 +33,13 @@ public:
 	void DetachWeapon(AWeapon* WeaponToAttach, FName SocketName);
 
 	void ToggleSheathState(AWeapon* WeaponToSheath);
+
+	void ShootProjectileNotifyBegan();
+	
 protected:
 	virtual void BeginPlay() override;
+
+	void TraceUnderCrosshairs(FHitResult& TraceHitResult);
 
 	void SetBlocking(bool bIsBlocking);
 
@@ -39,8 +49,12 @@ protected:
 	UFUNCTION()
 	void OnRep_EquippedWeapon();
 
+	void SetHUDCrosshairs(float DeltaTime);
+
 private:
 	ATrialsCharacter* Character;
+	ATrialsHUD* HUD;
+	ATrialsPlayerController* TrialsPlayerController;
 
 	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)
 	AWeapon* EquippedWeapon;
@@ -57,8 +71,10 @@ private:
 	UPROPERTY(EditAnywhere)
 	float BlockWalkSpeed;
 
+	UFUNCTION(Server, Reliable)
+	void ServerShootProjectileNotifyBegan(const FVector HitTarget);
+
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-		
+	
 };
