@@ -284,18 +284,21 @@ void ATrialsCharacter::PlayMontageFunction(UAnimMontage* MontageToPlay)
 	if (AnimInstance && MontageToPlay)
 	{
 		AnimInstance->Montage_Play(MontageToPlay);
-		AnimationSelectionINT = (AnimationSelectionINT + 1) % 2;
-		FName SelectionName = FName();
-		switch (AnimationSelectionINT)
+		if (AttackMontage && MontageToPlay == AttackMontage)
 		{
-		case 0:
-			SelectionName = FName("Attack1");
+			AnimationSelectionINT = (AnimationSelectionINT + 1) % 2;
+			FName SelectionName = FName();
+			switch (AnimationSelectionINT)
+			{
+			case 0:
+				SelectionName = FName("Attack1");
 				break;
-		case 1:
-			SelectionName = FName("Attack2");
+			case 1:
+				SelectionName = FName("Attack2");
 				break;
+			}
+			AnimInstance->Montage_JumpToSection(SelectionName, MontageToPlay);
 		}
-		AnimInstance->Montage_JumpToSection(SelectionName, MontageToPlay);
 	}
 }
 

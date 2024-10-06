@@ -14,13 +14,10 @@ class TRIALS_API AGenerationGamemode : public AGameMode
 {
 	GENERATED_BODY()
 	
+	virtual void BeginPlay() override;
 
 private:
-	void GenerateNoiseMap();
-	void GenerateWorld();
-	void GenerateRegions();
-	void SpawnVoxel(const FVector& Location);
-	void UnloadVoxel(const FVector& Location);
 	UPROPERTY(EditAnywhere, Category = "Voxel")
 	TSubclassOf<AActor> VoxelBlueprint;
+	
 };
