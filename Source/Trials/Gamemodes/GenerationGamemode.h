@@ -29,6 +29,7 @@ private:
 	// Constants for voxel size and noise parameters
 	const int VOXEL_SIZE = 100;
 	const int CHUNK_SIZE = 100; // Number of voxels along X and Y in one chunk
-	const float SCALE = 0.0001f; // Controls noise frequency (Smaller values = smoother terrain)
-	const float HEIGHT_MULTIPLIER = 5000.f;  // Controls how tall the terrain can be
+	const int FREQUENCY = 2; 
+	const int UNIT_SIZE = 9000;
+	const float AMPLITUDE = 2000.f;  // Controls how tall the terrain can be
 };

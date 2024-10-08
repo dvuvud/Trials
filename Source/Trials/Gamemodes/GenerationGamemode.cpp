@@ -26,9 +26,11 @@ void AGenerationGamemode::GenerateVoxelTerrain(PerlinNoise& NoiseGenerator, FVec
             float WorldY = Origin.Y + y * VOXEL_SIZE;
 
             // Sample Perlin noise to get the height value (in Z)
-            double NoiseValue = NoiseGenerator.noise(WorldX * SCALE, WorldY * SCALE);
+            double NoiseValue = NoiseGenerator.noise(WorldX * FREQUENCY / UNIT_SIZE, WorldY * FREQUENCY / UNIT_SIZE) * AMPLITUDE + 
+                NoiseGenerator.noise(WorldX * FREQUENCY / UNIT_SIZE, WorldY * FREQUENCY * 2 / UNIT_SIZE) * AMPLITUDE / 2+ 
+                NoiseGenerator.noise(WorldX * FREQUENCY / UNIT_SIZE, WorldY * FREQUENCY * 4/ UNIT_SIZE) * AMPLITUDE / 4;
             // Scale the noise value to fit within a range of Z heights
-            float Height = FMath::Clamp((NoiseValue * HEIGHT_MULTIPLIER), 0.0f, 10.0f * VOXEL_SIZE); // Adjust height range
+            float Height = FMath::Clamp((NoiseValue), 0.0f, 20.0f * VOXEL_SIZE); // Adjust height range
             int NumVoxelsHeight = FMath::FloorToInt(Height / VOXEL_SIZE); // Calculate the number of voxel layers
 
             // Spawn voxel blocks in Z layers (stack them)
