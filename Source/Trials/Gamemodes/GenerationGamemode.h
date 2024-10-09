@@ -10,7 +10,6 @@
  * 
  */
 class AVoxel;
-class PerlinNoise;
 
 UCLASS()
 class TRIALS_API AGenerationGamemode : public AGameMode
@@ -21,15 +20,16 @@ public:
 	
 	virtual void BeginPlay() override;
 
+	void GenerateVoxelTerrain(FVector2D Origin);
+
 private:
-	AVoxel* VoxelActor;
+	AVoxel* ChunkVoxelActor;
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AVoxel> VoxelActorClass;
-	void GenerateVoxelTerrain(PerlinNoise& NoiseGenerator, FVector Origin);
 	// Constants for voxel size and noise parameters
 	const int VOXEL_SIZE = 100;
-	const int CHUNK_SIZE = 100; // Number of voxels along X and Y in one chunk
+	const int CHUNK_SIZE = 16; // Number of voxels along X and Y in one chunk
 	const int FREQUENCY = 2; 
-	const int UNIT_SIZE = 9000;
-	const float AMPLITUDE = 2000.f;  // Controls how tall the terrain can be
+	const int UNIT_SIZE = 15000;
+	const int AMPLITUDE = 2000;  // Controls how tall the terrain can be
 };

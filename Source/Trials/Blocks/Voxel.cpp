@@ -10,6 +10,8 @@ AVoxel::AVoxel()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	InstancedMeshComponent = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("StaticMeshInstance"));
+	SetRootComponent(InstancedMeshComponent);
+
 }
 
 // Called when the game starts or when spawned
